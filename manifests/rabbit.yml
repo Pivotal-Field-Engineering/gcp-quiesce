@@ -1,0 +1,370 @@
+---
+name: p-rabbitmq-0e23c813b2c71395338d
+director_uuid: d1ac7054-ab09-4845-afff-f6ce1f770f65
+releases:
+- name: cf-rabbitmq
+  version: 222.11.0
+- name: service-metrics
+  version: 1.5.2
+- name: loggregator
+  version: '65'
+- name: rabbitmq-metrics
+  version: 1.49.0
+stemcells:
+- alias: bosh-google-kvm-ubuntu-trusty-go_agent
+  os: ubuntu-trusty
+  version: '3263.17'
+instance_groups:
+- name: rabbitmq-server
+  azs:
+  - us-east1-b
+  instances: 2
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-server
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  #- name: metron_agent
+    #release: loggregator
+    #consumes: {}
+    #provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-server-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: large
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: iqUPjIGbn2ZDqcO0lHpyNLW6Ji-7W6CD
+    loggregator:
+      etcd:
+        machines:
+        - 10.0.0.18
+    loggregator_endpoint:
+      shared_secret: iqUPjIGbn2ZDqcO0lHpyNLW6Ji-7W6CD
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-server-metrics/bin/rabbitmq-server-metrics"
+      metrics_command_args:
+      - "-erlangBinPath=/var/vcap/packages/erlang/bin/"
+      - "-rabbitmqCtlPath=/var/vcap/packages/rabbitmq-server/bin/rabbitmqctl"
+      - "-logPath=/var/vcap/sys/log/service-metrics/rabbitmq-server-metrics.log"
+      - "-rabbitmqUsername=admin"
+      - "-rabbitmqPassword=p1v0tal"
+      - "-rabbitmqApiEndpoint=http://127.0.0.1:15672"
+    syslog_aggregator:
+      address:
+      port:
+    rabbitmq-server:
+      networks:
+        apps: default
+      static_ips:
+      - 10.0.0.55
+      - 10.0.0.56
+      administrators:
+        management:
+          username: admin
+          password: p1v0tal
+        broker:
+          username: broker
+          password: oeOUzgkvKpSe7l-ZvBwMQZLDlNwujd2t
+      plugins:
+      - rabbitmq_management
+      ssl:
+        security_options:
+        key:
+        cert:
+        cacert:
+        verify: false
+        verification_depth: 5
+        fail_if_no_peer_cert: false
+      config:
+      cookie:
+      cluster_partition_handling: pause_minority
+  env:
+    bosh:
+      password: "$6$8cd5b8c0db80342f$mTANwYLfAHoEugpegfgrZ.RMnYgCPMedul6XS2ium3LMX0twEa.QJzxS2oGDbhGu79VNPBH/UrusASLFQIdlw."
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - 10.0.0.55
+    - 10.0.0.56
+  migrated_from:
+  - name: rabbitmq-server-partition-f4ee26c6db2bf4327152
+    az: us-east1-b
+  persistent_disk_type: '10240'
+  vm_extensions:
+  - vm-extension-rabbitmq-server-d58180962978f44c060c
+- name: rabbitmq-haproxy
+  azs:
+  - us-east1-b
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  #- name: metron_agent
+    #release: loggregator
+    #consumes: {}
+    #provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-haproxy-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: small
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: iqUPjIGbn2ZDqcO0lHpyNLW6Ji-7W6CD
+    loggregator:
+      etcd:
+        machines:
+        - 10.0.0.18
+    loggregator_endpoint:
+      shared_secret: iqUPjIGbn2ZDqcO0lHpyNLW6Ji-7W6CD
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-haproxy-metrics/bin/rabbitmq-haproxy-metrics"
+      metrics_command_args:
+      - "-haproxyNetwork=unix"
+      - "-haproxyAddress=/var/vcap/sys/run/rabbitmq-haproxy/haproxy.sock"
+      - "-logPath=/var/vcap/sys/log/service-metrics/rabbitmq-haproxy-metrics.log"
+    syslog_aggregator:
+      address:
+      port:
+    rabbitmq-haproxy:
+      stats:
+        username: admin
+        password: vSUNgq0oPuCPNR-yKBTgOs_go6ahQZJG
+      networks:
+        apps: default
+      server_ips:
+      - 10.0.0.55
+      - 10.0.0.56
+      ports: 15672, 5672, 5671, 1883, 8883, 61613, 61614, 15674
+  env:
+    bosh:
+      password: "$6$c8ece79f898e5800$/y0EiMcMtgK.m2xBaPo8YXHmSX5XKD46rZm4Bs4gfjG11KqN0ssYb4CjItigVrD6xHqehWLwmKTLEeeFKDhS90"
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - 10.0.0.57
+  migrated_from:
+  - name: rabbitmq-haproxy-partition-f4ee26c6db2bf4327152
+    az: us-east1-b
+  vm_extensions:
+  - vm-extension-rabbitmq-haproxy-6228f37c81d802cff1fc
+- name: rabbitmq-broker
+  azs:
+  - us-east1-b
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-broker
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  #- name: metron_agent
+    #release: loggregator
+    #consumes: {}
+    #provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-broker-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: small
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: iqUPjIGbn2ZDqcO0lHpyNLW6Ji-7W6CD
+    loggregator:
+      etcd:
+        machines:
+        - 10.0.0.18
+    loggregator_endpoint:
+      shared_secret: iqUPjIGbn2ZDqcO0lHpyNLW6Ji-7W6CD
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-broker-metrics/heartbeat.sh"
+      metrics_command_args:
+      - admin
+      - fkvZrBFPR-aDSKoQsqHQDqphL9anNSa8
+    syslog_aggregator:
+      address:
+      port:
+    rabbitmq-broker:
+      route: pivotal-rabbitmq-broker
+      ip: 10.0.0.58
+      networks:
+        apps: default
+      cc_endpoint: https://api.run.cloud.zwickey.net
+      cc_api_version: v2
+      uaa_endpoint: https://uaa.run.cloud.zwickey.net
+      uaa_client:
+        client_id: cf
+        username: system_services
+        password: yeO_jyafMxVrBYwsm8zjY6QKVu1BHKzo
+      rabbitmq:
+        operator_set_policy:
+          enabled: false
+          policy_name: operator_set_policy
+          policy_definition: '{"ha-mode": "exactly", "ha-params": 2, "ha-sync-mode":
+            "automatic"}
+
+'
+          policy_priority: 50
+        management_domain: pivotal-rabbitmq.run.cloud.zwickey.net
+        management_ip: 10.0.0.57
+        hosts:
+        - 10.0.0.57
+        dns_host:
+        administrator:
+          username: broker
+          password: oeOUzgkvKpSe7l-ZvBwMQZLDlNwujd2t
+        ssl:
+      service:
+        url: 10.0.0.58
+        username: admin
+        password: fkvZrBFPR-aDSKoQsqHQDqphL9anNSa8
+      logging:
+        level: info
+        print_stack_traces: true
+    cf:
+      domain: run.cloud.zwickey.net
+      nats:
+        host: 10.0.0.16
+        port: 4222
+        username: nats
+        password: qZn-CxTGaCNwHVSXPhM0XNQ8Tw_AgNoS
+  env:
+    bosh:
+      password: "$6$352c020258c9ecc3$WT1A9i7nvPBiCJjBTa9n12kRzgSPSJ88DwypFcbzd9o5clua4OYfeVDoq01WzaDLmmX8up2vzijO3fv3Sklef/"
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - 10.0.0.58
+  migrated_from:
+  - name: rabbitmq-broker-partition-f4ee26c6db2bf4327152
+    az: us-east1-b
+  vm_extensions:
+  - vm-extension-rabbitmq-broker-461b3865d6268efcdeab
+- name: broker-registrar
+  azs:
+  - us-east1-b
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-registrar
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-rabbitmq
+      host: pivotal-rabbitmq-broker.run.cloud.zwickey.net
+      username: admin
+      password: fkvZrBFPR-aDSKoQsqHQDqphL9anNSa8
+    cf:
+      api_url: https://api.run.cloud.zwickey.net
+      admin_username: system_services
+      admin_password: yeO_jyafMxVrBYwsm8zjY6QKVu1BHKzo
+      skip_ssl_validation: true
+  env:
+    bosh:
+      password: "$6$88d965c456c995d5$NCkYB92mEkRe.EOoBiRL6vlzFV2LPhW8ViD0z/nhCsPVcDzl626KUaQCnBlvJsM2gBDcM.LY87wg/BUSoDv/A1"
+  update:
+    max_in_flight: 1
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  vm_extensions:
+  - vm-extension-broker-registrar-2c6224fa5a7d469cb499
+- name: broker-deregistrar
+  azs:
+  - us-east1-b
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-deregistrar
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-rabbitmq
+      host: pivotal-rabbitmq-broker.run.cloud.zwickey.net
+      username: admin
+      password: fkvZrBFPR-aDSKoQsqHQDqphL9anNSa8
+    cf:
+      api_url: https://api.run.cloud.zwickey.net
+      admin_username: system_services
+      admin_password: yeO_jyafMxVrBYwsm8zjY6QKVu1BHKzo
+      skip_ssl_validation: true
+  env:
+    bosh:
+      password: "$6$5987cb9457eeb676$CL/XEV7TUzqAmOpQU1fdoT8yvz44vzfqmduaGoBkKpHMmQncOrKSrDuJ9XMeX7EKpEVITc4OW.XcKqDkbKcFs."
+  update:
+    max_in_flight: 1
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  vm_extensions:
+  - vm-extension-broker-deregistrar-60725113da5f4d12af1b
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  update_watch_time: 30000-300000
+  max_in_flight: 1
+  max_errors: 2
+  serial: true
