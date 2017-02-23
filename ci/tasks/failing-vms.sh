@@ -7,5 +7,6 @@ echo 'Checking BOSH VMs'
 
 bosh --ca-cert cacert/bosh.pem target $BOSH_URL
 bosh vms >> output.txt
+cat output.txt
 cat output.txt | grep failing | wc -l > result.txt
 grep 0 result.txt
