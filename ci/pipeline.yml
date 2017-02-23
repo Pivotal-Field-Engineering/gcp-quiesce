@@ -9,7 +9,7 @@ resources:
     private_key: {{github-key}}
 
 jobs:
-- name: quiesce
+- name: quiesce-status
   serial: true
   public: true
   plan:
@@ -28,6 +28,29 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
+- name: stop-grafana
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    passed:
+      - quiesce-status
+    trigger: true
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: stop
+    file:  assets/ci/tasks/stop.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENT_FILE: assets/manifests/influx-grafana.yml
+      DEPLOYMENT_NAME: influx-grafana
 
 - name: check
   serial: true
@@ -68,12 +91,7 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-  - task: bosh-vms-check
-    file:  assets/ci/tasks/failing-vms.yml
-    params:
-      BOSH_URL: {{bosh-url}}
-      BOSH_CLIENT: {{bosh-client}}
-      BOSH_CLIENT_SECRET: {{bosh-secret}}
+
 - name: startup-cf
   serial: true
   public: true
@@ -211,7 +229,7 @@ jobs:
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
       DEPLOYMENT_FILE: assets/manifests/influx-grafana.yml
-      DEPLOYMENT_NAME: influx-grafana.yml
+      DEPLOYMENT_NAME: influx-grafana
 - name: check-env
   serial: true
   public: true
