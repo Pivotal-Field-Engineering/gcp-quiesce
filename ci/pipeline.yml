@@ -172,6 +172,8 @@ jobs:
   plan:
   - get: assets
     trigger: false
+    passed:
+      - stop-cf
   - task: bosh-cacert
     file:  assets/ci/tasks/cacert.yml
     params:
