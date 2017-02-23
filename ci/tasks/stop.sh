@@ -11,5 +11,3 @@ bosh vms $DEPLOYMENT_NAME
 bosh -n stop --hard --force
 bosh vms $DEPLOYMENT_NAME >> output.txt
 cat output.txt
-#cat output.txt | grep failing | wc -l > result.txt
-#grep 0 result.txt
