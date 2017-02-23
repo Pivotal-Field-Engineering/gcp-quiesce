@@ -1,5 +1,5 @@
 #!/bin/bash
-echo 'Starting BOSH Deployment $DEPLOYMENT_NAME'
+echo "Starting BOSH Deployment $DEPLOYMENT_NAME"
 
 #Needed to login
 #$ export BOSH_CLIENT=ci

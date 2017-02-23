@@ -68,14 +68,6 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-  - task: start-cf
-    file:  assets/ci/tasks/start.yml
-    params:
-      BOSH_URL: {{bosh-url}}
-      BOSH_CLIENT: {{bosh-client}}
-      BOSH_CLIENT_SECRET: {{bosh-secret}}
-      DEPLOYMENT_FILE: cf.yml
-      DEPLOYMENT_NAME: cf-ddf5ae89e698bab6df31
   - task: bosh-vms-check
     file:  assets/ci/tasks/failing-vms.yml
     params:
@@ -97,21 +89,137 @@ jobs:
       BOSH_CACERT: {{bosh-cacert}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-  - task: start-cf
+  - task: start
     file:  assets/ci/tasks/start.yml
     params:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-      DEPLOYMENT_FILE: cf.yml
+      DEPLOYMENT_FILE: assets/manifests/cf.yml
       DEPLOYMENT_NAME: cf-ddf5ae89e698bab6df31
-- name: check-env
+- name: startup-mysql
   serial: true
   public: true
   plan:
   - get: assets
     passed:
       - startup-cf
+    trigger: true
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: start
+    file:  assets/ci/tasks/start.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENT_FILE: assets/manifests/mysql.yml
+      DEPLOYMENT_NAME: p-mysql-d66c2cacda1dbbf556bb
+- name: startup-rabbit
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    passed:
+      - startup-mysql
+    trigger: true
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: start
+    file:  assets/ci/tasks/start.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENT_FILE: assets/manifests/rabbit.yml
+      DEPLOYMENT_NAME: p-rabbitmq-0e23c813b2c71395338d
+- name: startup-cephfs
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    passed:
+      - startup-rabbit
+    trigger: true
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: start-cf
+    file:  assets/ci/tasks/start.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENT_FILE: assets/manifests/cephfs.yml
+      DEPLOYMENT_NAME: cephfs
+- name: startup-gf
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    passed:
+      - startup-cephfs
+    trigger: true
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: start
+    file:  assets/ci/tasks/start.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENT_FILE: assets/manifests/ff.yml
+      DEPLOYMENT_NAME: gemfire-cluster
+- name: startup-graphana
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    passed:
+      - startup-gf
+    trigger: true
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: start-cf
+    file:  assets/ci/tasks/start.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENT_FILE: assets/manifests/nflux-grafana.yml
+      DEPLOYMENT_NAME: influx-grafana.yml
+- name: check-env
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    trigger: true
+    passed:
+      - startup-graphana
   - task: bosh-cacert
     file:  assets/ci/tasks/cacert.yml
     params:
