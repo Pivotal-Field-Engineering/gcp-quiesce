@@ -9,4 +9,7 @@ bosh --ca-cert cacert/bosh.pem target $BOSH_URL
 bosh deployment $DEPLOYMENT_FILE
 bosh vms $DEPLOYMENT_NAME
 bosh -n start --force
-bosh vms $DEPLOYMENT_NAME
+bosh vms $DEPLOYMENT_NAME >> output.txt
+cat output.txt
+cat output.txt | grep failing | wc -l > result.txt
+grep 0 result.txt

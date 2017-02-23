@@ -187,7 +187,7 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-      DEPLOYMENT_FILE: assets/manifests/ff.yml
+      DEPLOYMENT_FILE: assets/manifests/gf.yml
       DEPLOYMENT_NAME: gemfire-cluster
 - name: startup-graphana
   serial: true
@@ -210,7 +210,7 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-      DEPLOYMENT_FILE: assets/manifests/nflux-grafana.yml
+      DEPLOYMENT_FILE: assets/manifests/influx-grafana.yml
       DEPLOYMENT_NAME: influx-grafana.yml
 - name: check-env
   serial: true
