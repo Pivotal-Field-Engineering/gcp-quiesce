@@ -29,6 +29,26 @@ jobs:
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
 
+- name: check
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    trigger: false
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: bosh-vms
+    file:  assets/ci/tasks/vms.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+
 - name: startup
   serial: true
   public: true
