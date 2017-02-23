@@ -1,0 +1,17 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: azwickey/deploy-worker
+run:
+  path: assets/ci/tasks/cacert.sh
+inputs:
+- name: assets
+outputs:
+- name: cacert
+params:
+  BOSH_URL: {{bosh-url}}
+  BOSH_CACERT: {{bosh-cacert}}
+  BOSH_CLIENT: {{bosh-client}}
+  BOSH_CLIENT_SECRET: {{bosh-secret}}

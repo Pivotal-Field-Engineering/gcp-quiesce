@@ -1,0 +1,21 @@
+
+
+resources:
+- name: assets
+  type: git
+  source:
+    uri: git@github.com:Pivotal-Field-Engineering/gcp-quiesce.git
+    branch: master
+    private_key: {{github-key}}
+
+jobs:
+- name: check-state
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    trigger: false
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+  - task: bosh-vms
+    file:  assets/ci/tasks/vms.yml

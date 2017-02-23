@@ -1,0 +1,15 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: azwickey/deploy-worker
+run:
+  path: assets/ci/tasks/vms.sh
+inputs:
+- name: assets
+- name: cacert
+params:
+  BOSH_URL: {{bosh-url}}
+  BOSH_CLIENT: {{bosh-client}}
+  BOSH_CLIENT_SECRET: {{bosh-secret}}
