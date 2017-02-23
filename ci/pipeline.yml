@@ -42,8 +42,8 @@ jobs:
       BOSH_CACERT: {{bosh-cacert}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-  - task: bosh-vms
-    file:  assets/ci/tasks/vms.yml
+  - task: bosh-vms-check
+    file:  assets/ci/tasks/failing-vms.yml
     params:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
