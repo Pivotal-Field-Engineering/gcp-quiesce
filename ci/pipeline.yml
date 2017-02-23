@@ -171,7 +171,7 @@ jobs:
   public: true
   plan:
   - get: assets
-    trigger: false
+    trigger: true
     passed:
       - stop-cf
   - task: bosh-cacert
