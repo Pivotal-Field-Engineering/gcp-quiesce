@@ -10,8 +10,3 @@ inputs:
 - name: assets
 outputs:
 - name: cacert
-params:
-  BOSH_URL: {{bosh-url}}
-  BOSH_CACERT: {{bosh-cacert}}
-  BOSH_CLIENT: {{bosh-client}}
-  BOSH_CLIENT_SECRET: {{bosh-secret}}

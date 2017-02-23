@@ -9,7 +9,3 @@ run:
 inputs:
 - name: assets
 - name: cacert
-params:
-  BOSH_URL: {{bosh-url}}
-  BOSH_CLIENT: {{bosh-client}}
-  BOSH_CLIENT_SECRET: {{bosh-secret}}
