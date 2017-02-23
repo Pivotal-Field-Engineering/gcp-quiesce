@@ -9,7 +9,7 @@ resources:
     private_key: {{github-key}}
 
 jobs:
-- name: check-state
+- name: quiesce
   serial: true
   public: true
   plan:
@@ -28,3 +28,31 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
+
+- name: startup
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    trigger: false
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: bosh-vms
+    file:  assets/ci/tasks/vms.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: start-cf
+    file:  assets/ci/tasks/start.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENT_FILE: cf.yml
+      DEPLOYMENT_NAME: cf-ddf5ae89e698bab6df31

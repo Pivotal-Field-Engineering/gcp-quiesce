@@ -1,0 +1,11 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: azwickey/deploy-worker
+run:
+  path: assets/ci/tasks/start.sh
+inputs:
+- name: assets
+- name: cacert
