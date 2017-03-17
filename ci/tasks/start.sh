@@ -15,7 +15,7 @@ do
     bosh vms $deployment
     bosh download manifest $deployment $deployment.yml
     bosh deployment $deployment.yml
-    #bosh -n start --force
+    bosh -n start --force
     bosh vms $deployment >> $deployment.txt
     cat $deployment.txt
 done
