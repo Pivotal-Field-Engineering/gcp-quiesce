@@ -12,10 +12,10 @@ for ((i = ${#deployment[@]} - 1;i >= 0;i--))
 do
     # call your procedure/other scripts here below
     echo "Stopping Deployment ${deployment[i]}"
-    #bosh vms $deployment
-    #bosh download manifest $deployment $deployment.yml
-    #bosh deployment $deployment.yml
-    #bosh -n stop --hard --force
-    #bosh vms $deployment >> $deployment.txt
-    #cat $deployment.txt
+    bosh vms $deployment
+    bosh download manifest $deployment $deployment.yml
+    bosh deployment $deployment.yml
+    bosh -n stop --hard --force
+    bosh vms $deployment >> $deployment.txt
+    cat $deployment.txt
 done
