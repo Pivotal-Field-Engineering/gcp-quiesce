@@ -1,12 +1,9 @@
-
-
 resources:
 - name: assets
   type: git
   source:
-    uri: git@github.com:Pivotal-Field-Engineering/gcp-quiesce.git
+    uri: https://github.com/azwickey-pivotal/gcp-quiesce
     branch: master
-    private_key: {{github-key}}
 
 jobs:
 - name: status
@@ -136,8 +133,7 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
-      DEPLOYMENT_FILE: assets/manifests/cf.yml
-      DEPLOYMENT_NAME: cf-ddf5ae89e698bab6df31
+      DEPLOYMENTS: {{deployments}}
 - name: check-running
   serial: true
   public: true
