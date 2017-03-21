@@ -6,11 +6,10 @@
 
 bosh --ca-cert cacert/bosh.pem target $BOSH_URL
 
-#Loops through specified deployments
+#Loops through specified deployments and stop in reverse order
 deployment=(${DEPLOYMENTS//,/ })
 for ((i = ${#deployment[@]} - 1;i >= 0;i--))
 do
-    # call your procedure/other scripts here below
     echo "Stopping Deployment ${deployment[i]}"
     bosh vms $deployment
     bosh download manifest $deployment $deployment.yml
