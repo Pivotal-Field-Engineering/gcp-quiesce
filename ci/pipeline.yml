@@ -155,3 +155,71 @@ jobs:
       BOSH_URL: {{bosh-url}}
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
+- name: pre-recreate-check
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    trigger: false
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: bosh-vms
+    file:  assets/ci/tasks/vms.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+- name: recreate
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    trigger: true
+    passed:
+      - pre-start-check
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: start-deployments
+    file:  assets/ci/tasks/recreate.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+      DEPLOYMENTS: {{deployments}}
+- name: check-env
+  serial: true
+  public: true
+  plan:
+  - get: assets
+    trigger: true
+    passed:
+    - start
+  - task: bosh-cacert
+    file:  assets/ci/tasks/cacert.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CACERT: {{bosh-cacert}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: bosh-vms
+    file:  assets/ci/tasks/vms.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
+  - task: bosh-vms-check
+    file:  assets/ci/tasks/failing-vms.yml
+    params:
+      BOSH_URL: {{bosh-url}}
+      BOSH_CLIENT: {{bosh-client}}
+      BOSH_CLIENT_SECRET: {{bosh-secret}}
