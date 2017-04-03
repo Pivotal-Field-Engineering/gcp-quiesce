@@ -181,7 +181,7 @@ jobs:
   - get: assets
     trigger: true
     passed:
-      - pre-start-check
+      - pre-recreate-check
   - task: bosh-cacert
     file:  assets/ci/tasks/cacert.yml
     params:
@@ -196,14 +196,14 @@ jobs:
       BOSH_CLIENT: {{bosh-client}}
       BOSH_CLIENT_SECRET: {{bosh-secret}}
       DEPLOYMENTS: {{deployments}}
-- name: check-env
+- name: check-env-recreate
   serial: true
   public: true
   plan:
   - get: assets
     trigger: true
     passed:
-    - start
+    - recreate
   - task: bosh-cacert
     file:  assets/ci/tasks/cacert.yml
     params:
