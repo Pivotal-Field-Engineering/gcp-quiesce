@@ -7,6 +7,18 @@ echo "Starting BOSH Deployment $DEPLOYMENT_NAME"
 
 bosh --ca-cert cacert/bosh.pem target $BOSH_URL
 
+#Loops through ODB instances
+bosh deployments | grep service- | cut -d \| -f 2
+for deployment in `bosh deployments | grep service- | cut -d \| -f 2` ; do
+  echo "Deployment $deployment"
+  bosh vms $deployment
+  bosh download manifest $deployment $deployment.yml
+  bosh deployment $deployment.yml
+  bosh -n start --force
+  bosh vms $deployment >> $deployment.txt
+  cat $deployment.txt
+done
+
 #Loops through specified deployments
 for deployment in ${DEPLOYMENTS//,/ }
 do
