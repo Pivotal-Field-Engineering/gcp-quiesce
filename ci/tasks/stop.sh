@@ -7,8 +7,8 @@
 bosh --ca-cert cacert/bosh.pem target $BOSH_URL
 
 #Loops through ODB instances
-bosh deployments | grep service- | cut -d \| -f 2
-for deployment in `bosh deployments | grep service- | cut -d \| -f 2` ; do
+bosh deployments | grep service-instance | cut -d \| -f 2
+for deployment in `bosh deployments | grep service-instance | cut -d \| -f 2` ; do
     echo "Stopping Deployment: $deployment"
     bosh vms $deployment
     bosh download manifest $deployment $deployment.yml
