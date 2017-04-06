@@ -14,7 +14,7 @@ for deployment in `bosh deployments | grep service-instance | cut -d \| -f 2` ; 
   bosh vms $deployment
   bosh download manifest $deployment $deployment.yml
   bosh deployment $deployment.yml
-  #bosh -n recreate --force
+  bosh -n recreate --force
   bosh vms $deployment >> $deployment.txt
   cat $deployment.txt
 done
