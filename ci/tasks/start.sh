@@ -13,6 +13,11 @@ for deployment in `bosh deployments | grep service-instance | cut -d \| -f 2` ; 
   echo "Deployment $deployment"
   bosh vms $deployment
   bosh download manifest $deployment $deployment.yml
+  #set UID
+  bosh status | grep UUID | tr -s ' ' | cut -d ' ' -f 3 > UID.txt
+  uid=`cat UID.txt`
+  echo "Director UID: $uid"
+  echo "director_uuid: $uid" >> $deployment.yml
   bosh deployment $deployment.yml
   bosh -n start --force
   bosh vms $deployment >> $deployment.txt
